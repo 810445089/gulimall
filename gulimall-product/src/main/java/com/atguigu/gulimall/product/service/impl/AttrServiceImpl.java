@@ -6,14 +6,13 @@ import com.atguigu.gulimall.product.dao.AttrAttrgroupRelationDao;
 import com.atguigu.gulimall.product.dao.AttrGroupDao;
 import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
+import com.atguigu.gulimall.product.vo.AttrGroupRelationVo;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -73,12 +72,16 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         QueryWrapper<AttrAttrgroupRelationEntity> wrapper1 = new QueryWrapper<>();
         wrapper1.in("attr_group_id", groupIds);
         List<AttrAttrgroupRelationEntity> relationEntities = attrAttrgroupRelationDao.selectList(wrapper1);
-        List<Long> attrIds = relationEntities.stream().map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
 
+        List<Long> attrIds = relationEntities.stream().map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
         QueryWrapper<AttrEntity> wrapper2 = new QueryWrapper<>();
         wrapper2.eq("catelog_id",  catelogId)
                 .eq("attr_type", ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode())
                 .nested(!attrIds.isEmpty(), (queryWrapper) -> queryWrapper.notIn("attr_id", attrIds));
+
+//        if (!attrIds.isEmpty()) {
+//            wrapper2.notIn("attr_id", attrIds);
+//        }
 
         String key = (String) params.get("key");
         if (StringUtils.isNotEmpty(key)) {
@@ -88,6 +91,17 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params), wrapper2);
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void deleteRelation(AttrGroupRelationVo[] vos) {
+        List<AttrAttrgroupRelationEntity> entities = Arrays.stream(vos).map(item -> {
+            AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
+            BeanUtils.copyProperties(item, relationEntity);
+            return relationEntity;
+        }).collect(Collectors.toList());
+
+        attrAttrgroupRelationDao.deleteBatchRelation(entities);
     }
 
 }

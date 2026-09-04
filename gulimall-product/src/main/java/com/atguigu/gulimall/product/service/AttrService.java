@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.product.service;
 
+import com.atguigu.gulimall.product.vo.AttrGroupRelationVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.gulimall.product.entity.AttrEntity;
@@ -21,5 +22,7 @@ public interface AttrService extends IService<AttrEntity> {
     List<AttrEntity> getRelationAttr(String attrGroupId);
 
     PageUtils getNoRelationAttr(Map<String, Object> params, Long attrGroupId);
+
+    void deleteRelation(AttrGroupRelationVo[] vos);
 }
 
