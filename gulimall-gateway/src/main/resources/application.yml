@@ -1,0 +1,52 @@
+
+server:
+  port: 88
+
+spring:
+  application:
+    name: gulimall-gateway
+  cloud:
+#    nacos:
+#      discovery:
+#        server-addr: 172.20.10.6:8848
+
+    gateway:
+      routes:
+        - id: rewritepath_route
+          uri: https://example.org
+          predicates:
+            - Path=/foo/**
+          filters:
+            - RewritePath=/red(?<segment>/?.*), $\{segment}
+        # 产品服务路由（更具体）
+        - id: product_route
+          uri: lb://gulimall-product
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - RewritePath=/api/(?<segment>/?.*), /$\{segment}
+        # 第三方服务路由（更具体）
+        - id: third_party_route
+          uri: lb://gulimall-third-party
+          predicates:
+            - Path=/api/thirdparty/**
+          filters:
+            - RewritePath=/api/thirdparty/(?<segment>/?.*), /$\{segment}
+        # 后台管理路由（通用兜底，放在最后）
+        - id: admin_route
+          uri: lb://renren-fast
+          predicates:
+            - Path=/api/**
+          filters:
+            - RewritePath=/api/(?<segment>/?.*), /renren-fast/$\{segment}
+
+#        - id: baidu_route
+#          uri: https://www.baidu.com
+#          predicates:
+#            - Query=rul,baidu
+#        - id: qq_route
+#          uri: https://www.qq.com/
+#          predicates:
+#            - Query=rul,qq
+
+

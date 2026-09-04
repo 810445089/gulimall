@@ -1,0 +1,16 @@
+server:
+  port: 9010
+
+
+spring:
+  application:
+    name: gulimall-order
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://192.168.0.24:3306/gulimall_oms
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.56.1
