@@ -6,6 +6,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
+import lombok.NonNull;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * 鍝佺墝鍒嗙被鍏宠仈
@@ -31,6 +35,7 @@ public class CategoryBrandRelationEntity implements Serializable {
 	/**
 	 * 鍒嗙被id
 	 */
+	@NotNull(message = "分类id不能为空")
 	private Long catelogId;
 	/**
 	 * 

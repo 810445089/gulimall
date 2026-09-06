@@ -1,11 +1,13 @@
 package com.atguigu.gulimall.product.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
 import com.atguigu.gulimall.product.entity.AttrEntity;
+import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
 import com.atguigu.gulimall.product.service.AttrService;
 import com.atguigu.gulimall.product.service.CategoryService;
 import com.atguigu.gulimall.product.vo.AttrGroupRelationVo;
@@ -38,9 +40,12 @@ public class AttrGroupController {
     @Autowired
     private AttrService attrService;
 
-    @GetMapping("attr/relation")
-    public R addRelation(@RequestParam Map<String, Object> params) {
+    @Autowired
+    AttrAttrgroupRelationService attrAttrgroupRelationService;
 
+    @PostMapping("/attr/relation")
+    public R addRelation(@RequestBody List<AttrGroupRelationVo> vos) {
+        attrAttrgroupRelationService.saveBatch(vos);
 
         return R.ok();
     }
@@ -77,11 +82,15 @@ public class AttrGroupController {
     /**
      * 信息
      */
-    @RequestMapping("/info/{attrGroupId}")
+    @GetMapping("/info/{attrGroupId}")
 //    @RequiresPermissions("product:attrgroup:info")
     public R info(@PathVariable("attrGroupId") Long attrGroupId){
 		AttrGroupEntity attrGroup = attrGroupService.getById(attrGroupId);
-        Long[] path = categoryService.findCatelogPath(attrGroup.getCatelogId());
+        Long catelogId = attrGroup.getCatelogId();
+        Long[] path = new Long[0];
+        if (catelogId != null) {
+            path = categoryService.findCatelogPath(catelogId);
+        }
         attrGroup.setCatalogPath(path);
         return R.ok().put("attrGroup", attrGroup);
     }

@@ -4,10 +4,17 @@ import com.alibaba.cloud.commons.lang.StringUtils;
 import com.atguigu.common.constant.ProductConstant;
 import com.atguigu.gulimall.product.dao.AttrAttrgroupRelationDao;
 import com.atguigu.gulimall.product.dao.AttrGroupDao;
+import com.atguigu.gulimall.product.dao.CategoryDao;
 import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
+import com.atguigu.gulimall.product.entity.CategoryEntity;
+import com.atguigu.gulimall.product.service.CategoryService;
 import com.atguigu.gulimall.product.vo.AttrGroupRelationVo;
+import com.atguigu.gulimall.product.vo.AttrRespVo;
+import com.atguigu.gulimall.product.vo.AttrVo;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +41,14 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
     @Autowired
     private AttrGroupDao attrGroupDao;
+
+    @Autowired
+    private CategoryDao categoryDao;
+
+    @Autowired
+    private CategoryService categoryService;
+    @Autowired
+    private AttrService attrService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -102,6 +117,95 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         }).collect(Collectors.toList());
 
         attrAttrgroupRelationDao.deleteBatchRelation(entities);
+    }
+
+    @Override
+    public PageUtils queryBaseAttrPage(Map<String, Object> params, Long catelogId) {
+        IPage<AttrEntity> entities = null;
+        QueryWrapper<AttrEntity> wrapper = new QueryWrapper<>();
+        String key = (String) params.get("key");
+        if (StringUtils.isNotEmpty(key)) {
+            wrapper.and(w -> w.eq("attr_id", key).or().like("attr_name", key));
+        }
+        if (catelogId == 0) {
+            entities = this.page(new Query<AttrEntity>().getPage(params), wrapper);
+        } else {
+            wrapper.eq("catelog_id", catelogId);
+            entities = this.page(new Query<AttrEntity>().getPage(params), wrapper);
+        }
+
+        PageUtils pageUtils = new PageUtils(entities);
+        List<AttrRespVo> respVos = entities.getRecords().stream().map(item -> {
+            AttrRespVo attrRespVo = new AttrRespVo();
+            BeanUtils.copyProperties(item, attrRespVo);
+
+            AttrAttrgroupRelationEntity entity = attrAttrgroupRelationDao.selectOne(
+                    new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", item.getAttrId())
+            );
+
+            if (entity != null) {
+                AttrGroupEntity group = attrGroupDao.selectById(entity.getAttrGroupId());
+                if (group != null) {
+                    attrRespVo.setGroupName(group.getAttrGroupName());
+                }
+            }
+
+            CategoryEntity category = categoryDao.selectById(item.getCatalogId());
+
+            attrRespVo.setCatalogName(category.getName());
+            return attrRespVo;
+        }).collect(Collectors.toList());
+        pageUtils.setList(respVos);
+        return pageUtils;
+    }
+
+    @Override
+    public AttrRespVo getAttrInfo(Long attrId) {
+        AttrRespVo respVo = new AttrRespVo();
+        AttrEntity attr = this.getById(attrId);
+        BeanUtils.copyProperties(attr, respVo);
+
+        if (attr.getAttrType() == ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode()) {
+            AttrAttrgroupRelationEntity entity = attrAttrgroupRelationDao.selectOne(
+                new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attrId)
+            );
+
+            if (entity != null) {
+                respVo.setAttrGroupId(entity.getAttrGroupId());
+
+            }
+
+        }
+
+        Long[] catelogPath = categoryService.findCatelogPath(attr.getCatalogId());
+        respVo.setCatalogPath(catelogPath);
+
+        return respVo;
+    }
+
+    @Override
+    public void updateAttr(AttrVo attr) {
+        AttrEntity attrEntity = new AttrEntity();
+        BeanUtils.copyProperties(attr, attrEntity);
+        this.updateById(attrEntity);
+
+        if (attr.getAttrType() == ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode()) {
+//            Integer count = attrAttrgroupRelationDao.selectCount(
+//                new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attr.getAttrId())
+//            );
+
+            AttrAttrgroupRelationEntity entity = new AttrAttrgroupRelationEntity();
+            entity.setAttrGroupId(attr.getAttrGroupId());
+            entity.setAttrId(attr.getAttrId());
+
+//            if (count > 0) {
+//
+//            }
+            attrAttrgroupRelationDao.update(entity, new UpdateWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attr.getAttrId()));
+        }
+        AttrEntity attr1 = attrService.getById(attr.getAttrId());
+
+
     }
 
 }

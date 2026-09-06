@@ -14,6 +14,7 @@ import com.atguigu.gulimall.product.service.CategoryBrandRelationService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.R;
 
+import javax.validation.Valid;
 
 
 /**
@@ -72,7 +73,7 @@ public class CategoryBrandRelationController {
      */
     @RequestMapping("/save")
 //    @RequiresPermissions("product:categorybrandrelation:save")
-    public R save(@RequestBody CategoryBrandRelationEntity categoryBrandRelation){
+    public R save(@Valid @RequestBody CategoryBrandRelationEntity categoryBrandRelation){
 		categoryBrandRelationService.saveDetail(categoryBrandRelation);
 
         return R.ok();
