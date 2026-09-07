@@ -120,19 +120,21 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     }
 
     @Override
-    public PageUtils queryBaseAttrPage(Map<String, Object> params, Long catelogId) {
-        IPage<AttrEntity> entities = null;
+    public PageUtils queryBaseAttrPage(Map<String, Object> params, Long catelogId, String attrType) {
+
         QueryWrapper<AttrEntity> wrapper = new QueryWrapper<>();
+        wrapper.eq("attr_type", "base".equalsIgnoreCase(attrType) ? ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode() : ProductConstant.AttrEnum.ATTR_TYPE_SALE.getCode());
+
         String key = (String) params.get("key");
         if (StringUtils.isNotEmpty(key)) {
             wrapper.and(w -> w.eq("attr_id", key).or().like("attr_name", key));
         }
-        if (catelogId == 0) {
-            entities = this.page(new Query<AttrEntity>().getPage(params), wrapper);
-        } else {
+
+        if (catelogId != 0) {
             wrapper.eq("catelog_id", catelogId);
-            entities = this.page(new Query<AttrEntity>().getPage(params), wrapper);
         }
+
+        IPage<AttrEntity> entities = this.page(new Query<AttrEntity>().getPage(params), wrapper);
 
         PageUtils pageUtils = new PageUtils(entities);
         List<AttrRespVo> respVos = entities.getRecords().stream().map(item -> {
@@ -140,7 +142,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             BeanUtils.copyProperties(item, attrRespVo);
 
             AttrAttrgroupRelationEntity entity = attrAttrgroupRelationDao.selectOne(
-                    new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", item.getAttrId())
+                new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", item.getAttrId())
             );
 
             if (entity != null) {

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.atguigu.gulimall.product.entity.BrandEntity;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +34,7 @@ public class CategoryBrandRelationController {
     @GetMapping("/brands/list")
     public R relationBrandsList(@RequestParam Long catId) {
 
+        List<BrandEntity> entities = categoryBrandRelationService.getBrandsByCatId(catId);
 
         return R.ok();
     }
