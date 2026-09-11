@@ -34,9 +34,9 @@ public class CategoryBrandRelationController {
     @GetMapping("/brands/list")
     public R relationBrandsList(@RequestParam Long catId) {
 
-        List<BrandEntity> entities = categoryBrandRelationService.getBrandsByCatId(catId);
+        List<CategoryBrandRelationEntity> brands = categoryBrandRelationService.getBrandsByCatId(catId);
 
-        return R.ok();
+        return R.ok().put("data", brands);
     }
 
     @GetMapping("/catalog/list")

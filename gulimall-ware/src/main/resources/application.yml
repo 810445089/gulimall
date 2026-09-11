@@ -1,0 +1,19 @@
+server:
+  port: 11000
+
+spring:
+  application:
+    name: gulimall-ware
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3307/gulimall_wms?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+
+logging:
+  level:
+    com.atguigu.gulimall.ware: debug

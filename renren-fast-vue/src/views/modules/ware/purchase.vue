@@ -243,6 +243,7 @@ export default {
     opendrawer(row) {
       this.getUserList();
       this.currentRow = row;
+      this.userId = row.assigneeId
       this.caigoudialogVisible = true;
     },
     assignUser() {
@@ -298,6 +299,7 @@ export default {
         url: this.$http.adornUrl("/ware/purchase/list"),
         method: "get",
         params: this.$http.adornParams({
+          status: this.dataForm.status,
           page: this.pageIndex,
           limit: this.pageSize,
           key: this.dataForm.key

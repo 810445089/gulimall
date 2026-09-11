@@ -12,7 +12,7 @@
       <el-option
         v-for="item in brands"
         :key="item.brandId"
-        :label="item.name"
+        :label="item.brandName"
         :value="item.brandId"
       >
       </el-option>
@@ -33,8 +33,8 @@ export default {
       catId: 0,
       brands: [
         {
-          name: "a",
-          value: 1
+          brandName: "a",
+          brandId: 1
         }
       ],
       brandId: "",

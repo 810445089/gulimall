@@ -16,7 +16,7 @@
             ref="spuBaseForm"
             :model="spu"
             label-width="120px"
-            :rules="spuBaseInfoRules"
+            :rules="spuBaseInfoRules"选择销售属
           >
             <el-form-item label="商品名称" prop="spuName">
               <el-input v-model="spu.spuName"></el-input>
@@ -447,10 +447,10 @@ export default {
           { required: true, message: "请选择一个品牌", trigger: "blur" }
         ],
         descript: [
-          { required: true, message: "请上传商品详情图集", trigger: "blur" }
+          // { required: true, message: "请上传商品详情图集", trigger: "blur" }
         ],
         images: [
-          { required: true, message: "请上传商品图片集", trigger: "blur" }
+          // { required: true, message: "请上传商品图片集", trigger: "blur" }
         ],
         weight: [
           {

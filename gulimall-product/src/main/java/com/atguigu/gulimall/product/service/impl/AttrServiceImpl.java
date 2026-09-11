@@ -31,6 +31,7 @@ import com.atguigu.common.utils.Query;
 import com.atguigu.gulimall.product.dao.AttrDao;
 import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.service.AttrService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("attrService")
@@ -47,8 +48,9 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
     @Autowired
     private CategoryService categoryService;
-    @Autowired
-    private AttrService attrService;
+
+//    @Autowired
+//    private AttrService attrService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -61,7 +63,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     }
 
     @Override
-    public List<AttrEntity> getRelationAttr(String attrGroupId) {
+    public List<AttrEntity> getRelationAttr(Long attrGroupId) {
         QueryWrapper<AttrAttrgroupRelationEntity> wrapper = new QueryWrapper<AttrAttrgroupRelationEntity>();
         wrapper.eq("attr_group_id", attrGroupId);
         List<AttrAttrgroupRelationEntity> entities = attrAttrgroupRelationDao.selectList(wrapper);
@@ -185,6 +187,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         return respVo;
     }
 
+    @Transactional
     @Override
     public void updateAttr(AttrVo attr) {
         AttrEntity attrEntity = new AttrEntity();
@@ -205,9 +208,19 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 //            }
             attrAttrgroupRelationDao.update(entity, new UpdateWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attr.getAttrId()));
         }
-        AttrEntity attr1 = attrService.getById(attr.getAttrId());
+//        AttrEntity attr1 = attrService.getById(attr.getAttrId());
 
 
+    }
+
+    @Override
+    public List<Long> selectSearchAttrIds(List<Long> attrIds) {
+
+        if (attrIds == null || attrIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return baseMapper.selectSearchAttrIds(attrIds);
     }
 
 }

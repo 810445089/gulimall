@@ -6,6 +6,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import java.io.Serializable;
 import java.util.Date;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
 /**
@@ -23,6 +26,7 @@ public class PurchaseEntity implements Serializable {
 	/**
 	 * 閲囪喘鍗昳d
 	 */
+    @JsonSerialize(using = ToStringSerializer.class)
 	@TableId
 	private Long id;
 	/**

@@ -126,7 +126,7 @@ export default {
               id: this.dataForm.id || undefined,
               purchaseId: this.dataForm.purchaseId,
               skuId: this.dataForm.skuId,
-              skuNum: this.dataForm.skuNum,
+              skuNum: ~~this.dataForm.skuNum,
               skuPrice: this.dataForm.skuPrice,
               wareId: this.dataForm.wareId,
               status: this.dataForm.status

@@ -32,7 +32,7 @@
                   >
                     <el-option
                       v-for="(val, vidx) in attr.valueSelect.split(';')"
-                      :key="vidx"
+                      :key="gidx + vidx"
                       :label="val"
                       :value="val"
                     >

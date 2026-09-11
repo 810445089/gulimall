@@ -4,7 +4,6 @@ import com.atguigu.gulimall.product.dao.BrandDao;
 import com.atguigu.gulimall.product.dao.CategoryDao;
 import com.atguigu.gulimall.product.entity.BrandEntity;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
-import com.atguigu.gulimall.product.service.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,14 +54,15 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
     }
 
     @Override
-    public List<BrandEntity> getBrandsByCatId(Long catId) {
-        QueryWrapper<BrandEntity> wrapper = new QueryWrapper<>();
+    public List<CategoryBrandRelationEntity> getBrandsByCatId(Long catId) {
+        QueryWrapper<CategoryBrandRelationEntity> wrapper = new QueryWrapper<>();
         if (catId != 0) {
-
+            wrapper.eq("catelog_id", catId);
         }
-        List<BrandEntity> list = brandDao.selectList(wrapper);
 
-        return Collections.emptyList();
+        List<CategoryBrandRelationEntity> list = this.list(wrapper);
+
+        return list;
     }
 
 }

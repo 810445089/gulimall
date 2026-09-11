@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
 /**
@@ -22,6 +25,7 @@ public class WareSkuEntity implements Serializable {
 	/**
 	 * id
 	 */
+    @JsonSerialize(using = ToStringSerializer.class)
 	@TableId
 	private Long id;
 	/**
@@ -31,6 +35,7 @@ public class WareSkuEntity implements Serializable {
 	/**
 	 * 浠撳簱id
 	 */
+    @JsonSerialize(using = ToStringSerializer.class)
 	private Long wareId;
 	/**
 	 * 搴撳瓨鏁

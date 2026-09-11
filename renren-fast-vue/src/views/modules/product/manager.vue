@@ -185,8 +185,8 @@ export default {
       brandIdSub: null,
       dataForm: {
         key: "",
-        brandId: 0,
-        catalogId: 0,
+        brandId: "",
+        catalogId: "",
         price: {
           min: 0,
           max: 0

@@ -25,6 +25,8 @@ spring:
             - Path=/api/product/**
           filters:
             - RewritePath=/api/(?<segment>/?.*), /$\{segment}
+
+
         # 第三方服务路由（更具体）
         - id: third_party_route
           uri: lb://gulimall-third-party
@@ -32,6 +34,21 @@ spring:
             - Path=/api/thirdparty/**
           filters:
             - RewritePath=/api/thirdparty/(?<segment>/?.*), /$\{segment}
+
+        - id: member_route
+          uri: lb://gulimall-member
+          predicates:
+            - Path=/api/member/**
+          filters:
+            - RewritePath=/api/(?<segment>.*/), /$\{segment}
+
+        - id: ware_route
+          uri: lb://gulimall-ware
+          predicates:
+            - Path=/api/ware/**
+          filters:
+            - RewritePath=/api/(?<path>.*/), /$\{path}
+
         # 后台管理路由（通用兜底，放在最后）
         - id: admin_route
           uri: lb://renren-fast

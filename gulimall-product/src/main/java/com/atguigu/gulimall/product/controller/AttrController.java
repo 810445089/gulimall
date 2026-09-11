@@ -1,9 +1,12 @@
 package com.atguigu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 //import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.atguigu.gulimall.product.entity.ProductAttrValueEntity;
+import com.atguigu.gulimall.product.service.ProductAttrValueService;
 import com.atguigu.gulimall.product.vo.AttrRespVo;
 import com.atguigu.gulimall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,16 @@ import com.atguigu.common.utils.R;
 public class AttrController {
     @Autowired
     private AttrService attrService;
+
+    @Autowired
+    private ProductAttrValueService productAttrValueService;
+
+    @GetMapping("/base/listforspu/{spuid}")
+    public R baseAttrList(@PathVariable Long spuid){
+        List<ProductAttrValueEntity> entities = productAttrValueService.baseAttrListForSpu(spuid);
+        return R.ok().put("data",entities);
+    }
+
 //    @PathVariable("attrType") String type,
     @GetMapping("/{attrType}/list/{catelogId}")
     public R baseAttrList(@PathVariable Long catelogId,
@@ -82,6 +95,11 @@ public class AttrController {
         return R.ok();
     }
 
+    @PostMapping("/update/{spuId}")
+    public R update(@PathVariable Long spuId, @RequestBody List<ProductAttrValueEntity> attr) {
+        productAttrValueService.updateSpuAttr(spuId, attr);
+        return R.ok();
+    }
     /**
      * 删除
      */
