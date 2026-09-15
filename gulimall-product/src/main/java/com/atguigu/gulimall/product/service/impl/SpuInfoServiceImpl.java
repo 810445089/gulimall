@@ -9,6 +9,7 @@ import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.product.entity.BrandEntity;
 import com.atguigu.gulimall.product.entity.ProductAttrValueEntity;
 import com.atguigu.gulimall.product.entity.SkuInfoEntity;
+import com.atguigu.gulimall.product.feign.SearchFeignService;
 import com.atguigu.gulimall.product.feign.WareFeignService;
 import com.atguigu.gulimall.product.service.*;
 import org.springframework.beans.BeanUtils;
@@ -48,6 +49,9 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     @Autowired
     private BrandService brandService;
+
+    @Autowired
+    private SearchFeignService searchFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -110,38 +114,45 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         }).collect(Collectors.toList());
 
         // 1. 远程查询sku的库存，是否有库存
-//        Map<Long, Boolean> stockMap = null;
-//        try {
-//            R skuHasStock = wareFeignService.getSkuHasStock(skuIdList);
-//            stockMap = skuHasStock.getData(new TypeReference<List<SkuHasStockTo>>() {}).stream()
-//                    .collect(Collectors.toMap(SkuHasStockTo::getSkuId, SkuHasStockTo::getHasStock));
-//        } catch(Exception e) {
-//            log.error("远程查询库存信息失败:{}", e);
-//        }
+        Map<Long, Boolean> stockMap = null;
+        try {
+            R skuHasStock = wareFeignService.getSkuHasStock(skuIdList);
+            stockMap = skuHasStock.getData(new TypeReference<List<SkuHasStockTo>>() {}).stream()
+                    .collect(Collectors.toMap(SkuHasStockTo::getSkuId, SkuHasStockTo::getHasStock));
+        } catch(Exception e) {
+            log.error("远程查询库存信息失败:{}", e);
+        }
 
         System.out.println("11111111111111");
         // 2.封装每个sku的信息
-//        Map<Long, Boolean> finalStockMap = stockMap;
-//        skuInfoEntities.stream().map(sku -> {
-//            SkuEsModel skuEsModel = new SkuEsModel();
-//            BeanUtils.copyProperties(sku, skuEsModel);
-//            // 设置库存信息
-//            if (finalStockMap == null) {
-//                skuEsModel.setHasStock(true);
-//            } else {
-//                skuEsModel.setHasStock(finalStockMap.get(sku.getSkuId()));
-//            }
-//            // 2. 热度分值
-//            skuEsModel.setHotScore(0L);
-//
-//            BrandEntity brandEntity = brandService.getById(sku.getBrandId());
-//            skuEsModel.setBrandId(brandEntity.getBrandId());
-//            skuEsModel.setBrandName(brandEntity.getName());
-//
-//            return skuEsModel;
-//        }).collect(Collectors.toList());
+        Map<Long, Boolean> finalStockMap = stockMap;
+        List<SkuEsModel> skuEsModels = skuInfoEntities.stream().map(sku -> {
+            SkuEsModel skuEsModel = new SkuEsModel();
+            BeanUtils.copyProperties(sku, skuEsModel);
+            // 设置库存信息
+            if (finalStockMap == null) {
+                skuEsModel.setHasStock(true);
+            } else {
+                skuEsModel.setHasStock(finalStockMap.get(sku.getSkuId()));
+            }
+            // 2. 热度分值
+            skuEsModel.setHotScore(0L);
 
-        baseMapper.updateSpuStatus(spuId, ProductConstant.StatusEnum.SPU_UP.getCode());
+            BrandEntity brandEntity = brandService.getById(sku.getBrandId());
+            skuEsModel.setBrandId(brandEntity.getBrandId());
+            skuEsModel.setBrandName(brandEntity.getName());
+
+            return skuEsModel;
+        }).collect(Collectors.toList());
+
+//      5.将数据发送给es进行保存
+        R r = searchFeignService.productStatusUp(skuEsModels);
+
+        if (r.getCode() == 0) {
+            baseMapper.updateSpuStatus(spuId, ProductConstant.StatusEnum.SPU_UP.getCode());
+        } else {
+
+        }
     }
 
 }
