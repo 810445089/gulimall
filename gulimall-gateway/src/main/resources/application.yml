@@ -54,6 +54,11 @@ spring:
           predicates:
             - Host=search.gulimall.com
 
+        - id: gulimall_product_route
+          uri: lb://gulimall-product
+          predicates:
+            - Host=**.gulimall.com,gulimall.com
+
         # 后台管理路由（通用兜底，放在最后）
         - id: admin_route
           uri: lb://renren-fast

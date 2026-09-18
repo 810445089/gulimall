@@ -6,9 +6,7 @@ import com.atguigu.common.constant.ProductConstant;
 import com.atguigu.common.to.SkuHasStockTo;
 import com.atguigu.common.to.es.SkuEsModel;
 import com.atguigu.common.utils.R;
-import com.atguigu.gulimall.product.entity.BrandEntity;
-import com.atguigu.gulimall.product.entity.ProductAttrValueEntity;
-import com.atguigu.gulimall.product.entity.SkuInfoEntity;
+import com.atguigu.gulimall.product.entity.*;
 import com.atguigu.gulimall.product.feign.SearchFeignService;
 import com.atguigu.gulimall.product.feign.WareFeignService;
 import com.atguigu.gulimall.product.service.*;
@@ -29,7 +27,6 @@ import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.Query;
 
 import com.atguigu.gulimall.product.dao.SpuInfoDao;
-import com.atguigu.gulimall.product.entity.SpuInfoEntity;
 
 
 @Service("spuInfoService")
@@ -52,6 +49,9 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     @Autowired
     private SearchFeignService searchFeignService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -129,6 +129,9 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         List<SkuEsModel> skuEsModels = skuInfoEntities.stream().map(sku -> {
             SkuEsModel skuEsModel = new SkuEsModel();
             BeanUtils.copyProperties(sku, skuEsModel);
+            skuEsModel.setSkuPrice(sku.getPrice());
+            skuEsModel.setSkuImg(sku.getSkuDefaultImg());
+
             // 设置库存信息
             if (finalStockMap == null) {
                 skuEsModel.setHasStock(true);
@@ -138,9 +141,16 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             // 2. 热度分值
             skuEsModel.setHotScore(0L);
 
+            // 3. 查询品牌和分类的名字
             BrandEntity brandEntity = brandService.getById(sku.getBrandId());
             skuEsModel.setBrandId(brandEntity.getBrandId());
             skuEsModel.setBrandName(brandEntity.getName());
+            skuEsModel.setBrandImg(brandEntity.getLogo());
+
+            CategoryEntity categoryEntity = categoryService.getById(skuEsModel.getCatalogId());
+            skuEsModel.setCatalogName(categoryEntity.getName());
+
+            skuEsModel.setAttrs(attrsList);
 
             return skuEsModel;
         }).collect(Collectors.toList());

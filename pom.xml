@@ -10,11 +10,11 @@
 	<description>聚合服务</description>
 	<packaging>pom</packaging>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.6.RELEASE</version>  <!-- 这就是 Spring Boot 版本 -->
-    </parent>
+<!--    <parent>-->
+<!--        <groupId>org.springframework.boot</groupId>-->
+<!--        <artifactId>spring-boot-starter-parent</artifactId>-->
+<!--        <version>2.3.6.RELEASE</version>  &lt;!&ndash; 这就是 Spring Boot 版本 &ndash;&gt;-->
+<!--    </parent>-->
 
 	<properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

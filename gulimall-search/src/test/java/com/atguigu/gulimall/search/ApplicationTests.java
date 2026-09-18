@@ -24,12 +24,15 @@ import org.elasticsearch.search.aggregations.metrics.Avg;
 import org.elasticsearch.search.aggregations.metrics.AvgAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.util.Map;
 
+@RunWith(SpringRunner.class)
 @SpringBootTest
 class ApplicationTests {
 
@@ -53,6 +56,23 @@ class ApplicationTests {
         private String email;
         private String city;
         private String state;
+
+        @Override
+        public String toString() {
+            return "Account{" +
+                    "account_number=" + account_number +
+                    ", balance=" + balance +
+                    ", firstname='" + firstname + '\'' +
+                    ", lastname='" + lastname + '\'' +
+                    ", age=" + age +
+                    ", gender='" + gender + '\'' +
+                    ", address='" + address + '\'' +
+                    ", employer='" + employer + '\'' +
+                    ", email='" + email + '\'' +
+                    ", city='" + city + '\'' +
+                    ", state='" + state + '\'' +
+                    '}';
+        }
     }
 
     @Data
