@@ -51,7 +51,13 @@
 <!--                </exclusion>-->
 <!--            </exclusions>-->
         </dependency>
+        <!--Spring Cache，使用注解简化开发-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
 
+        <!--jedis，redis客户端，解决压测堆外内存溢出，springboot2.3.2已解决-->
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>

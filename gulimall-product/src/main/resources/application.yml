@@ -19,15 +19,22 @@ spring:
     date-format: yyyy-MM-dd HH-mm:ss
 #  关闭缓存，调试时可以实时查看效果
   thymeleaf:
-    cache: false
+    cache: true
 
   redis:
     host: 192.168.33.10
     port: 6379
+  cache:
+    type: redis # 使用redis作为缓存
+    redis:
+#      time-to-live: 3600 # 过期时间
+#      key-prefix: CACHE_ # 会导致自己在@Cacheable里设置的名字失效，所以这里不指定
+      use-key-prefix: true # key值加前缀
+      cache-null-values: true # 缓存控制
 
 mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       id-type: auto

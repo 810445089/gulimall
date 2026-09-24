@@ -4,6 +4,7 @@ import com.atguigu.gulimall.product.dao.BrandDao;
 import com.atguigu.gulimall.product.dao.CategoryDao;
 import com.atguigu.gulimall.product.entity.BrandEntity;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +64,13 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
         List<CategoryBrandRelationEntity> list = this.list(wrapper);
 
         return list;
+    }
+
+    @Override
+    public void updateCategory(Long catId, String name) {
+        CategoryBrandRelationEntity relationEntity = new CategoryBrandRelationEntity();
+        relationEntity.setCatelogName(name);
+        this.update(relationEntity, new UpdateWrapper<CategoryBrandRelationEntity>().eq("catelog_id", catId));
     }
 
 }

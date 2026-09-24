@@ -26,7 +26,6 @@ spring:
           filters:
             - RewritePath=/api/(?<segment>/?.*), /$\{segment}
 
-
         # 第三方服务路由（更具体）
         - id: third_party_route
           uri: lb://gulimall-third-party
@@ -67,6 +66,16 @@ spring:
           filters:
             - RewritePath=/api/(?<segment>/?.*), /renren-fast/$\{segment}
 
+
+        - id: gulimall_host_route
+          uri: lb://gulimall-product
+          predicates:
+            - Host=gulimall.com,item.gulimall.com
+
+        - id: hello_route
+          uri: lb://gulimall-product
+          predicates:
+            - Path=/hello
 #        - id: baidu_route
 #          uri: https://www.baidu.com
 #          predicates:
