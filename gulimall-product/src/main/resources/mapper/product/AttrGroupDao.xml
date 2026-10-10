@@ -13,5 +13,12 @@
         <result property="catalogId" column="catalog_id"/>
     </resultMap>
 
-
+    <select id="getAttrGroupWithAttrsBySpuId" resultType="com.atguigu.gulimall.product.vo.SpuItemAttrGroupVo">
+        select pav.`spu_id`, ag.`attr_group_name`, ag.`attr_group_id`, aar.`attr_id`, attr.`attr_name`, pav.`attr_value`
+        from `pms_attr_group` ag
+                left join `pms_attr_attrgroup_relation` aar on ag.`attr_group_id` = aar.`attr_group_id`
+                left join `pms_attr` attr on attr.`attr_id` = attr.`attr_id`
+                left join `pms_product_attr_value` pav on pav.`attr_id` = attr.`attr_id`
+        where ag.`catalog_id` = #{catalogId} and pav.`spu_id` = #{spuId}
+    </select>
 </mapper>

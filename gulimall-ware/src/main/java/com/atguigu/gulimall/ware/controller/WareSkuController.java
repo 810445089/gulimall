@@ -32,7 +32,7 @@ public class WareSkuController {
 
     @PostMapping("/hasstock")
     public R getSkuHasStock(@RequestBody List<Long> skuIds) {
-        List<SkuHasStockVo> skuHasStock = wareSkuService.getSkuHasStock();
+        List<SkuHasStockVo> skuHasStock = wareSkuService.getSkuHasStock(skuIds);
         return R.ok().setData(skuHasStock);
     }
     /**

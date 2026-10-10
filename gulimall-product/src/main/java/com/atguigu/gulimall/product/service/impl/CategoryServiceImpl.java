@@ -9,15 +9,12 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
-import java.beans.Transient;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -31,6 +28,7 @@ import com.atguigu.common.utils.Query;
 import com.atguigu.gulimall.product.dao.CategoryDao;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
 import com.atguigu.gulimall.product.service.CategoryService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("categoryService")
@@ -139,23 +137,37 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Override
     public Map<String, List<Catalog2Vo>> getCatalogJson2() {
-        String catalogJson = stringRedisTemplate.opsForValue().get("catalogJson");
+        RLock lock = redissonClient.getLock("catalogJson-lock");
+        lock.lock(30, TimeUnit.SECONDS);
 
-        if (StringUtils.isEmpty(catalogJson)) {
-            return getCatalogJsonFromDbWithRedissonLock();
+        try {
+            Map<String, List<Catalog2Vo>> listMap = getCatalogJsonFromDbWithRedis();
+            return listMap;
+        } finally {
+            lock.unlock();
         }
-
-        return JSON.parseObject(catalogJson, new TypeReference<Map<String, List<Catalog2Vo>>>(){});
     }
 
 //    @CacheEvict(value = {"category"}, key = "'level1Categorys'") // 失效模式，方法执行完删除缓存
 //    @CachePut(value = "category", key = "'level1Categorys'") // 双写模式，方法执行完更新缓存
 
-    @Caching(evict = {
-            @CacheEvict(value = "category", key = "'level1Categorys'"),
-            @CacheEvict(value = "category", key = "'catalogJson'")
-    })
-    @Transient
+    /**
+     * 失效模式，级联更新类型时，删除与类型相关的所有缓存
+     * @param category
+     * 方式1：指定每个key
+     */
+//    @Caching(evict = {
+//            @CacheEvict(value = "category", key = "'level1Categorys'"),
+//            @CacheEvict(value = "category", key = "'catalogJson'")
+//    })
+
+    /**
+     * 方式2：直接删除区域化内所有缓存
+     * @param category
+     */
+    @CacheEvict(value = {"category"}, allEntries = true)
+
+    @Transactional
     @Override
     public void updateCascade(CategoryEntity category) {
         this.updateById(category);
@@ -166,17 +178,24 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     private Map<String, List<Catalog2Vo>> getCatalogJsonFromDbWithRedissonLock() {
-        RLock lock = redissonClient.getLock("catalogJson-lock");
-        lock.lock(30, TimeUnit.SECONDS);
 
-        Map<String, List<Catalog2Vo>> listMap = null;
-        try {
-            listMap = getCatalogJsonFromDbWithRedis();
-        } finally {
-            lock.unlock();
+        String catalogJson = stringRedisTemplate.opsForValue().get("catalogJson");
+
+        if (StringUtils.isEmpty(catalogJson)) {
+            RLock lock = redissonClient.getLock("catalogJson-lock");
+            lock.lock(30, TimeUnit.SECONDS);
+
+            Map<String, List<Catalog2Vo>> listMap = null;
+            try {
+                listMap = getCatalogJsonFromDbWithRedis();
+            } finally {
+                lock.unlock();
+            }
+
+            return listMap;
         }
 
-        return listMap;
+        return JSON.parseObject(catalogJson, new TypeReference<Map<String, List<Catalog2Vo>>>(){});
     }
 
     public Map<String, List<Catalog2Vo>> getCatalogJsonFromDbWithRedisLock() {

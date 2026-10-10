@@ -56,7 +56,12 @@ spring:
         - id: gulimall_product_route
           uri: lb://gulimall-product
           predicates:
-            - Host=**.gulimall.com,gulimall.com
+            - Host=gulimall.com,item.gulimall.com
+#
+#        - id: gulimall_search_route
+#          uri: lb://gulimall-search
+#          predicates:
+#            - Host=search.gulimall.com
 
         # 后台管理路由（通用兜底，放在最后）
         - id: admin_route
